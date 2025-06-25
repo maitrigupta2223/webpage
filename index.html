@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maitri Gupta's File Upload Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .upload-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 30px 0;
+            border: 2px dashed #dee2e6;
+            transition: all 0.3s ease;
+        }
+
+        .upload-section:hover {
+            border-color: #667eea;
+            background: #f0f2ff;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .file-input {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-input-button {
+            display: block;
+            padding: 15px 30px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            text-align: center;
+            transition: transform 0.2s ease;
+            width: 100%;
+        }
+
+        .file-input-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .file-preview {
+            margin-top: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            display: none;
+        }
+
+        .demo-info {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        .demo-info h3 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .demo-info p {
+            color: #856404;
+            font-size: 14px;
+        }
+
+        .status-message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <!-- 
+    WARNING: This is a demo application with intentional security vulnerabilities!
+    DO NOT USE IN PRODUCTION!
+    
+    Sensitive Information Below (Demo Only):
+    Admin Username: admin@maitrigupta.com
+    Admin Password: SuperSecretPass123!
+    Database Connection: mysql://user:password123@internal-db.company.local:3306/maindb
+    API Key: sk-demo123456789abcdef_DO_NOT_USE_IN_PROD
+    JWT Secret: mySecretJWTKey2024!@#$
+    Internal API Endpoint: https://internal-api.company.local/v1/admin
+    AWS Access Key: AKIADEMOKEY123456789
+    AWS Secret: wJalrXUtnFEMI/K7MDENG/bPxRfiCYDEMOKEY
+    Internal IP Range: 192.168.1.0/24
+    Admin Panel: /secret-admin-panel-xyz
+    -->
+
+    <div class="container">
+        <h1>Welcome to Maitri Gupta's File Upload Demo</h1>
+        
+        <div class="upload-section">
+            <h3>File Upload Demonstration</h3>
+            <p>Select a file to upload (front-end demo only):</p>
+            
+            <div class="file-input-wrapper">
+                <input type="file" id="fileInput" class="file-input" accept="*/*">
+                <label for="fileInput" class="file-input-button">
+                    Choose File to Upload
+                </label>
+            </div>
+            
+            <div id="filePreview" class="file-preview">
+                <h4>File Information:</h4>
+                <p id="fileName"></p>
+                <p id="fileSize"></p>
+                <p id="fileType"></p>
+            </div>
+            
+            <div id="statusMessage" class="status-message"></div>
+            
+            <button id="uploadBtn" onclick="simulateUpload()" style="display: none; margin-top: 15px; padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                Simulate Upload
+            </button>
+        </div>
+
+        <div class="demo-info">
+            <h3>⚠️ Demo Security Notice</h3>
+            <p>This is a demonstration website showing common web security vulnerabilities. The file upload functionality is intentionally insecure and for educational purposes only. In a real application, proper validation, sanitization, and security measures should always be implemented.</p>
+        </div>
+    </div>
+
+    <script>
+        // WARNING: Hardcoded sensitive information - NEVER do this in production!
+        const CONFIG = {
+            apiKey: "demo_api_key_12345_INSECURE",
+            adminToken: "bearer_token_admin_xyz789",
+            databaseUrl: "mongodb://admin:password@internal-mongo.company.local:27017/proddb",
+            internalApiUrl: "https://api-internal.company.local/v2/",
+            debugMode: true,
+            adminEmail: "admin@maitrigupta.com",
+            secretKey: "this-is-a-very-secret-key-2024"
+        };
+
+        // Demo credentials (NEVER store like this!)
+        const DEMO_USERS = {
+            admin: "admin123!@#",
+            developer: "dev_password_456",
+            tester: "test_account_789"
+        };
+
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            
+            if (file) {
+                // Insecure file handling - no validation!
+                displayFileInfo(file);
+                document.getElementById('uploadBtn').style.display = 'block';
+                showStatus('File selected successfully!', 'success');
+            }
+        });
+
+        function displayFileInfo(file) {
+            const preview = document.getElementById('filePreview');
+            const fileName = document.getElementById('fileName');
+            const fileSize = document.getElementById('fileSize');
+            const fileType = document.getElementById('fileType');
+            
+            fileName.textContent = `Name: ${file.name}`;
+            fileSize.textContent = `Size: ${(file.size / 1024).toFixed(2)} KB`;
+            fileType.textContent = `Type: ${file.type || 'Unknown'}`;
+            
+            preview.style.display = 'block';
+        }
+
+        function simulateUpload() {
+            // Vulnerable upload simulation - accepts any file type!
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showStatus('No file selected!', 'error');
+                return;
+            }
+
+            // Simulating insecure upload process
+            showStatus('Uploading...', 'success');
+            
+            setTimeout(() => {
+                // Insecure: No file type validation, size limits, or security checks
+                const uploadPath = `/uploads/${file.name}`; // Direct file name usage - path traversal risk!
+                
+                showStatus(`File "${file.name}" uploaded successfully to ${uploadPath}! (Demo only)`, 'success');
+                
+                // Log sensitive information to console (bad practice!)
+                console.log('Upload completed:', {
+                    file: file.name,
+                    apiKey: CONFIG.apiKey,
+                    uploadPath: uploadPath,
+                    adminToken: CONFIG.adminToken
+                });
+            }, 1500);
+        }
+
+        function showStatus(message, type) {
+            const statusEl = document.getElementById('statusMessage');
+            statusEl.textContent = message;
+            statusEl.className = `status-message ${type}`;
+            statusEl.style.display = 'block';
+        }
+
+        // Debug function that exposes sensitive data (insecure!)
+        function debugInfo() {
+            console.log('Debug Info:', CONFIG);
+            console.log('Demo Users:', DEMO_USERS);
+            return {
+                config: CONFIG,
+                users: DEMO_USERS,
+                internalPaths: [
+                    '/admin/dashboard',
+                    '/api/internal/users',
+                    '/debug/logs',
+                    '/config/database'
+                ]
+            };
+        }
+
+        // Expose debug function globally (security risk!)
+        window.debugInfo = debugInfo;
+
+        console.log('Maitri Gupta Demo Site Loaded');
+        console.log('API Endpoint:', CONFIG.internalApiUrl);
+        console.log('Admin Token:', CONFIG.adminToken);
+    </script>
+</body>
+</html>
